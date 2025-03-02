@@ -22,6 +22,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
     WebView webView;
+    private ProgressBar progressBar;
     RelativeLayout no_internet_layout;
     boolean hasConnect;
 
@@ -44,10 +46,11 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         webView=findViewById(R.id.web_view);
+        progressBar=findViewById(R.id.progressBar);
         no_internet_layout=findViewById(R.id.no_internet_layout);
 
         webView.setWebViewClient(new MyWebClient());
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new MyWebChromeClient());
 
         ConnectivityManager manager = (ConnectivityManager)MainActivity.this
                 .getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -88,6 +91,14 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private class MyWebChromeClient extends  WebChromeClient{
+        @Override
+        public void onProgressChanged(WebView view, int newProgress) {
+            super.onProgressChanged(view, newProgress);
+            progressBar.setProgress(newProgress); // Update progress as the page loads
+        }
+    }
+
 
 
 
@@ -96,6 +107,12 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public void onPageStarted(WebView view, String url, Bitmap favicon) {
             super.onPageStarted(view, url, favicon);
+            progressBar.setVisibility(ProgressBar.VISIBLE);
+        }
+
+        public  void onPageFinished(WebView view,String url){
+            super.onPageFinished(view,url);
+            progressBar.setVisibility(ProgressBar.GONE);
         }
 
         @Override
@@ -109,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
 
             super.onReceivedError(view, errorCode, description, failingUrl);
+            progressBar.setVisibility(ProgressBar.GONE);
 
         }
 
@@ -123,6 +141,8 @@ public class MainActivity extends AppCompatActivity {
             return  false;
         }
     }
+
+
 
 
 
